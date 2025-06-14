@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>創作者選單展示</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@600;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: #e0f7fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .main-display {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: center;
+      margin-top: 20px;
+      width: 90%;
+      max-width: 1280px;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .main-image-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: top center;
+      border-radius: 15px;
+      height: 100%;
+      animation: fadein 1s ease-in-out;
+    }
+    @keyframes fadein {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #creatorName {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 70px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 900;
+      color: white;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+      z-index: 2;
+      text-align: right;
+    }
+    .creator-info-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .creator-info-overlay .social-links a {
+      display: inline-block;
+      text-decoration: none;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 600;
+      color: white;
+      background: black;
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    .creator-info-overlay .social-links a:hover {
+      background-color: #D42149;
+    }
+    .thumbnail-section {
+      height: 100vh;
+      flex: 0.5;
+      padding: 50px 30px 20px 30px;
+      background-color: transparent;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .thumbnail-section h3 {
+      font-size: 60px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 900;
+      color: white;
+      margin: 0 0 30px 0;
+      text-align: center;
+      text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+    }
+    .thumbnail-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-gap: 10px;
+    }
+    .thumbnail img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(0,0,0,0.7);
+      object-fit: cover;
+      object-position: top;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .thumbnail img:hover {
+      transform: scale(1.2);
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .nav-buttons button {
+      margin: 0 10px;
+      padding: 8px 16px;
+      font-size: 18px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: bold;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .nav-buttons button:hover {
+      background-color: #D42149;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-display">
+    <div class="main-image-wrapper" id="mainWrapper">
+      <h2 id="creatorName">創作者</h2>
+      <div class="creator-info-overlay" id="creatorInfo">
+        <div class="social-links" id="socialLinks"></div>
+      </div>
+    </div>
+    <div class="thumbnail-section">
+      <h3>參展陣容</h3>
+      <div class="thumbnail-grid" id="thumbnailGrid"></div>
+      <div class="nav-buttons">
+        <button onclick="scrollPage(-1)">&#8592;</button>
+        <button onclick="scrollPage(1)">&#8594;</button>
+      </div>
+    </div>
+  </div>
+
+ <script>
+    const creators = [
+      { name: 'Non', link: 'https://www.instagram.com/non_nonsummerjack/', avatar: 'https://static.wixstatic.com/media/3d17ac_aa9bcde545814e38990ff74c922e7e49~mv2.jpg' },
+      { name: 'Sally多啦雪', link: 'https://www.instagram.com/iamdorasnow/', avatar: 'https://static.wixstatic.com/media/ff520e_408f7e4d76f34d68811f43e94e3e2b5c~mv2.jpg' },
+      { name: '小咪', link: 'https://instagram.com/kotori_0214', avatar: 'https://static.wixstatic.com/media/3c3d7d_3825b5e65b4b4d179ecea346cbcdb755~mv2.jpeg' },
+      { name: '哈嚕', link: 'https://www.instagram.com/harubaby_nya', avatar: 'https://static.wixstatic.com/media/3c3d7d_1f47cea179174074a8a5ac31b9a3843e~mv2.jpeg' },
+      { name: '小空Sora', link: 'https://www.facebook.com/konkon6927', avatar: 'https://static.wixstatic.com/media/217bc1_eec58e6f761d46969af374d37252b66b~mv2.jpg' },
+      { name: 'Dory', link: 'https://www.instagram.com/dory_0.6.2.0?igsh=MXJmeDVyZnRkb3FoNQ==', avatar: 'https://static.wixstatic.com/media/cd3624_f232f0a4b9724adfb6d7e0f3919cf596~mv2.jpeg' },
+      { name: '苔苔', link: 'https://www.instagram.com/taitai257/', avatar: 'https://static.wixstatic.com/media/3d17ac_39d5953890764033beba958ec50e21ac~mv2.png' },
+      { name: '凌晨', link: 'https://instagram.com/qaws_1109', avatar: 'https://static.wixstatic.com/media/3d17ac_a0b8186992f84e0faa2aa43c481a025c~mv2.png' },
+      { name: 'CocoPie', link: 'https://linktr.ee/cocopie0218', avatar: 'https://static.wixstatic.com/media/758652_3bc890d040ae47b4921a9c95875b18f0~mv2.jpg' },
+      { name: '千尋', link: 'https://www.facebook.com/loveno1chihiro', avatar: 'https://static.wixstatic.com/media/047de8_b4ae84a284f142d08bc5e23473a523e8~mv2.jpg' },
+      { name: '孫齊sun qi', link: 'https://www.instagram.com/mazikeen_salvatore_?igsh=MWZkZzFtbDUyd2Z2dA%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/3c9d20_8bba3576665840adaef300f961f931e6~mv2.jpeg' },
+      { name: '綺綺chi', link: 'https://x.com/fcup1214?s=21', avatar: 'https://static.wixstatic.com/media/3c9d20_ce38211f4aa247ffa5e94e9d776863a6~mv2.jpeg' },
+      { name: 'Yuumeilyn', link: 'https://twitter.com/yuumeilyn', avatar: 'https://static.wixstatic.com/media/3a459d_37e7b7f3fbd84fa8a98a1d9775e9e4b8~mv2.jpeg' },
+      { name: 'Minichu', link: 'https://www.instagram.com/minichu.cos?igsh=MWE4OHlsN2theGduaQ%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/2dc0f8_4cc9899b27ae48f891fab0aa5118f593~mv2.jpeg' },
+      { name: 'Mirin_Shu', link: 'https://linktr.ee/mirin_shuu', avatar: 'https://static.wixstatic.com/media/9099a5_2db39f84074c4d0186368ffda5cc3a77~mv2.jpeg' },
+      { name: 'Chuneko', link: 'https://www.instagram.com/chuneko__?igsh=ZnZ1Nmg5cDhycnlq', avatar: 'https://static.wixstatic.com/media/3d17ac_5e2f173396874f0fbce307639d6c326f~mv2.png' },
+      { name: 'DreamTamu', link: 'https://x.com/MengMen96873739?t=WBz5kChFaEgDtOmf0bpf-Q&s=09', avatar: 'https://static.wixstatic.com/media/a93553_cebfcf0f852d4aa09f97f906cce4fe19~mv2.jpg' },
+      { name: '三三', link: 'https://www.facebook.com/Princess33TW', avatar: 'https://static.wixstatic.com/media/859378_88f23c4a10d5478abef98c04c72778b6~mv2.jpg' },
+      { name: '培培', link: 'https://www.facebook.com/profile.php?id=100086624349985', avatar: 'https://static.wixstatic.com/media/859378_126b2ba6c9ef47c295435992d3765738~mv2.jpg' },
+      { name: '龜龜', link: 'https://joy.gallery/kameka25217', avatar: 'https://static.wixstatic.com/media/cb11c0_837fdf88407e4f6bbc1066517d9650de~mv2.jpg' },
+      { name: 'Tako', link: 'https://www.instagram.com/tako_chang9144?igsh=MXBoNW5hbWxtbzh3cA%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/765630_6647cd82c0b74bf7888bc0051069adcf~mv2.jpeg' },
+      { name: '白云', link: 'https://www.instagram.com/baiyun._.0905?igsh=MWwxem5zYXY1ZHNoZQ==', avatar: 'https://static.wixstatic.com/media/765630_12c905d3e08d49b3a4aa82bc5cbedf1f~mv2.jpeg' },
+      { name: '月永小愛', link: 'https://www.instagram.com/yuatan_dayo', avatar: 'https://static.wixstatic.com/media/765630_a5d4cf8e6067431995ea9b6d29e1e8b5~mv2.jpeg' },
+      { name: 'NoNo咪', link: 'https://www.instagram.com/12_1.c?igsh=N2VtdHNjdWpodWN2&utm_source=qr', avatar: 'https://static.wixstatic.com/media/e0ad5e_006d0dea0e13466cba119b49e63d0da3~mv2.jpeg' },
+      { name: '涼子', link: 'https://www.instagram.com/ryokooo_0625_5.0', avatar: 'https://static.wixstatic.com/media/834878_8d3eaf416ef34d8cb5ece5f0495dad6e~mv2.jpeg' },
+      { name: '安生', link: 'https://www.instagram.com/anshi__kuromi707', avatar: 'https://static.wixstatic.com/media/834878_aad98c1eb6ac443e8976ab1b2370591f~mv2.jpeg' },
+      { name: 'Luffy', link: 'https://www.facebook.com/luffy0501', avatar: 'https://static.wixstatic.com/media/cb30db_d145015f74784df69b75b8de92631415~mv2.jpg' },
+      { name: '桃桃 To To', link: 'https://www.facebook.com/totocosplay0w0', avatar: 'https://static.wixstatic.com/media/cb30db_53f820e1c00d454390f93b59aef2284a~mv2.jpg' },
+      { name: 'Miya', link: 'https://www.instagram.com/sherry40723yw/', avatar: 'https://static.wixstatic.com/media/5b2c47_ac46d15c445546b59172b4ea9136415c~mv2.jpeg' },
+      { name: '小紫', link: 'https://www.instagram.com/shizuru_515?igsh=MTIydm9nbjcycnplNg==', avatar: 'https://static.wixstatic.com/media/5b2c47_8952b46d070f46a3a67c71e079bb61e0~mv2.jpeg' },
+      { name: '艾爾', link: 'https://www.instagram.com/ayrartemis', avatar: 'https://static.wixstatic.com/media/e9a3d8_9bb184f334354df688b350bce9309986~mv2.jpg' },
+      { name: '菇菇', link: 'https://www.facebook.com/share/1A7nGrufCS/?mibextid=wwXIfr', avatar: 'https://static.wixstatic.com/media/e9a3d8_88a874a0f38b429dba010e2b69803461~mv2.jpg' },
+      { name: 'limo', link: 'https://www.instagram.com/ilmo_limo.00?igsh=OHV1czNoZ2dkNWVn&utm_source=qr', avatar: 'https://static.wixstatic.com/media/e9a3d8_43378f6d47504931ab4dd619b126979b~mv2.jpg' },
+      { name: 'Ruka', link: 'https://www.instagram.com/ruka24533?igsh=MWw2Y2IzaW40MGIwNw==', avatar: 'https://static.wixstatic.com/media/f4f3cd_3067410a4390457e859cecb101e60360~mv2.jpeg' },
+      { name: 'Stityo悠', link: 'https://www.facebook.com/TWcoserStityo', avatar: 'https://static.wixstatic.com/media/65209d_3b4749d7ffad49d1834fc17a4cb1b2cd~mv2.jpg' },
+      { name: 'Liya璃犽', link: 'https://www.facebook.com/caio.only', avatar: 'https://static.wixstatic.com/media/65209d_d9d517a5423b4795b4ab246311d3ec8f~mv2.jpg' },
+      { name: 'Chi崎', link: 'https://www.facebook.com/chiducc', avatar: 'https://static.wixstatic.com/media/65209d_d79c97b6b6c0471c946280c0cf37328c~mv2.jpg' },
+      { name: '消弭Mi', link: 'https://www.facebook.com/AMEMORIxMI', avatar: 'https://static.wixstatic.com/media/65209d_cde3f33b316b429cbd9980cdf9b0938a~mv2.jpg' },
+      { name: '佞佞Ning', link: 'https://www.instagram.com/ningning_only/', avatar: 'https://static.wixstatic.com/media/6fbee7_1717b9c513c143f3893cbcea77b6868c~mv2.jpg' },
+      { name: '艾青Iris', link: 'https://www.instagram.com/irisching1229/', avatar: 'https://static.wixstatic.com/media/6fbee7_7330503d39a04cc8a657120a00d61897~mv2.jpg' },
+      { name: '羋夢Doris', link: 'https://www.instagram.com/mimo0120aa/', avatar: 'https://static.wixstatic.com/media/6fbee7_f07c8cc7f9fa4852ae17f714c079b3e3~mv2.jpg' },
+      { name: '阿瓈', link: 'https://www.instagram.com/lethekhaos/', avatar: 'https://static.wixstatic.com/media/3d17ac_cddb47ce75b549d99a03a2a071f3db6c~mv2.png' },
+      { name: '茶理', link: 'https://www.instagram.com/charlie211226__/', avatar: 'https://static.wixstatic.com/media/3d17ac_c514078566744c77b478b8ec439f869b~mv2.png' },
+      { name: '皊皊', link: 'https://www.instagram.com/linlinling152/?hl=zh-tw', avatar: 'https://static.wixstatic.com/media/3d17ac_c3bb2f74dc5a471ab4953b514a812b9f~mv2.png' },
+      { name: 'わたあめふわり', link: 'https://x.com/wataame_IDOL', avatar: 'https://static.wixstatic.com/media/b4eac8_7f55d4e230ae4df69a05221beda18243~mv2.jpg' },
+      { name: '茹茹', link: 'https://www.instagram.com/howdanoruru?fbclid=IwY2xjawJyhPhleHRuA2FlbQIxMAABHioSrCv19m10zYXnUxDVDXl-yZjBJmz54_VZWQnSyI_YFPEh-t8Ay_50XHIU_aem_c31LcJfGrqwVFF2irso3VQ', avatar: 'https://static.wixstatic.com/media/fc0d20_70f3351bc8ea4bbaabc2da13c48386cf~mv2.jpg' },
+      { name: '咪呦', link: 'https://www.instagram.com/cherrybear1026/', avatar: 'https://static.wixstatic.com/media/fc0d20_a3b679895866498cb5d91e0ada096094~mv2.jpg' },
+      { name: '慕慕', link: 'https://www.facebook.com/share/1CEL562Lo1/?mibextid=wwXIfr', avatar: 'https://static.wixstatic.com/media/7d31e6_a2d06f5d47814ac6af49fbb8499546ce~mv2.jpeg' },
+      { name: '紫姝', link: 'https://www.facebook.com/sue8586', avatar: 'https://static.wixstatic.com/media/3d17ac_527dfedc8d76472da259f6ec9968538c~mv2.png' },
+      { name: '結音', link: 'https://x.com/cos_yui0709?t=oXmxvRAh-acCJSvQTXwAYw&s=09', avatar: 'https://static.wixstatic.com/media/db85e3_2e4c9196dab84e2f8a47a5b870a79034~mv2.jpg' },
+      { name: '曉愛', link: 'https://www.instagram.com/xuan87909?igsh=MWc3M2Vyd2t0bnJuNA==7', avatar: 'https://static.wixstatic.com/media/db85e3_37db8b1fe79e4c45aef4d182174bb57b~mv2.jpg' },
+      { name: '荼蘼', link: 'https://Instagram.com/felicia.w.1220', avatar: 'https://static.wixstatic.com/media/db85e3_4b47697dff22480295bc62d3a707ccd4~mv2.jpg' },
+      { name: 'Kami', link: 'https://www.instagram.com/kamikami_v', avatar: 'https://static.wixstatic.com/media/b92c02_414f4d20966b420281d84905ef8d76c6~mv2.jpeg' },
+      { name: '小琪 Aki', link: 'https://www.instagram.com/ringoaki', avatar: 'https://static.wixstatic.com/media/b92c02_305808fc40bc4a19904a7e58b3bba123~mv2.jpeg' },
+      { name: '趙趙', link: 'https://www.instagram.com/c_h_a_o___', avatar: 'https://static.wixstatic.com/media/91f9a7_43ef14443da74ec8a06b483faa79386c~mv2.jpeg' },
+      { name: 'くろえべいびー', link: 'https://t.co/c0fr00Ckre', avatar: 'https://static.wixstatic.com/media/e4cbcb_02096ca983504befb08e280f5a59148b~mv2.png' },
+      { name: '蜜雅', link: 'https://x.com/miachuchu0811', avatar: 'https://static.wixstatic.com/media/c8179c_77d781d884aa43a7872d8194baa3bbe6~mv2.jpg' },
+      { name: '𝘒𝘶𝘮𝘰𝘳𝘪', link: 'https://x.com/kumori_01', avatar: 'https://static.wixstatic.com/media/c8179c_0cf1c2908b574e3e823e6176356960fb~mv2.jpg' },
+      { name: 'Hatori 紀奈奈', link: 'https://x.com/cindychi_88', avatar: 'https://static.wixstatic.com/media/232d23_cf2acbb2ef7e45cca1bf29bdf6928aef~mv2.jpg' },
+      { name: 'Yomi', link: 'https://www.facebook.com/getsuyuu.yomi?rdid=AMAfUNq8evm0i5r5&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F16BfCLf6tD%2F#', avatar: 'https://static.wixstatic.com/media/232d23_d5e7ffdb425d4ec08a3524e0e9ee7acf~mv2.jpg' },
+      { name: 'いのり', link: 'https://x.com/ia_inori?s=21', avatar: 'https://static.wixstatic.com/media/671728_8c87cd924c7046f2935be2a6f0f19703~mv2.jpeg' },
+      { name: '狸狸', link: 'https://www.facebook.com/share/1EULjbGHNM/?mibextid=wwXIfr', avatar: 'https://static.wixstatic.com/media/83a480_2ebc949f66274e0fb2d4aaa044bd7b25~mv2.jpeg' },
+      { name: '小小柔', link: 'https://www.instagram.com/zzzoe_331?igsh=YXByMWFjMmI5ZDdm&utm_source=qr', avatar: 'https://static.wixstatic.com/media/462dd4_1d6386376fcb4db486b8e74fe79667ed~mv2.jpeg' },
+      { name: 'Meenfox', link: 'https://www.instagram.com/meenfox_/', avatar: 'https://static.wixstatic.com/media/ea4b7a_84f942c099e0499a8411dfe9e9a7fc68~mv2.jpg' },
+      { name: '小諾不睏', link: 'https://www.instagram.com/_nuonuo27/', avatar: 'https://static.wixstatic.com/media/c95d06_1488f1bf05404d2e9b2146ab4f6ed912~mv2.jpg' },
+      { name: '班班', link: 'https://linktr.ee/abanbanbanban', avatar: 'https://static.wixstatic.com/media/513fc1_6bad54df6d204f03bfc9851962659957~mv2.jpg' },
+      { name: 'ʜᴀᴍᴄᴏᴏʟᴇʀ', link: 'https://www.facebook.com/profile.php?id=100063606541104', avatar: 'https://static.wixstatic.com/media/14974b_0a604cc0c3584f249fb12f4d34206a9a~mv2.jpg' },
+      { name: 'ONINI', link: 'https://www.facebook.com/Nuneaonini', avatar: 'https://static.wixstatic.com/media/14974b_5228bbbd8e3c4f65b2c47cc0e29431f6~mv2.jpg' },
+      { name: 'JasperZ', link: 'https://www.facebook.com/Jas69per', avatar: 'https://static.wixstatic.com/media/326e74_5d0f98d347344df6a6ba0a766189f3f9~mv2.jpg' },
+      { name: '菈小菈', link: 'https://www.instagram.com/la0730svt/', avatar: 'https://static.wixstatic.com/media/42085e_c95f2145332349a1b4b20596657d7518~mv2.jpg' },
+      { name: '夏艾', link: 'https://www.instagram.com/cii0119/', avatar: 'https://static.wixstatic.com/media/42085e_2d936af07c0a473d96d111bba59398f2~mv2.jpg' },
+      { name: '楊小篆', link: 'https://www.instagram.com/chuan_yy?igsh=a2ZiZDNzZzBjcmN6&utm_source=qr', avatar: 'https://static.wixstatic.com/media/3678a9_97b6212ba7d2447e9e36660a4da408c4~mv2.jpeg' },
+      { name: 'Dai Dairy', link: 'https://www.instagram.com/dai_dairy.th?igsh=c3FndTd4cDMzc3F6&utm_source=qr', avatar: 'https://static.wixstatic.com/media/5d75b1_abc65ebeb8234378bf78c14d0718efab~mv2.jpeg' },
+      { name: 'Hakune', link: 'https://www.instagram.com/hakune_cos?igsh=eHpkdjNtMzBsdjI0', avatar: 'https://static.wixstatic.com/media/5d75b1_c21670bf46da4743864a2fe8696c99cd~mv2.jpeg' },
+      { name: 'Mewjiic', link: 'https://www.instagram.com/mewjiic_cos?igsh=MWEyeXhmemYxZW1yMg==', avatar: 'https://static.wixstatic.com/media/5d75b1_99b11672488a4e8491f13a680859f7d0~mv2.jpeg' },
+      { name: '榕榕子', link: 'https://www.instagram.com/rongrongku/', avatar: 'https://static.wixstatic.com/media/a50bf6_1a5f2effebb44cd6b610fbd37f3dfc64~mv2.jpeg' },
+      { name: 'Chale', link: 'https://www.instagram.com/chaleee.25?igsh=enRuemI0Nmp3Nncw&utm_source=qr', avatar: 'https://static.wixstatic.com/media/ff0957_f5d0130f24a14caaac44ccada0a9b8ea~mv2.jpeg' },
+      { name: 'Aki', link: 'https://www.instagram.com/aki_s1025?igsh=cjJ4cG9zMm1rZjNv', avatar: 'https://static.wixstatic.com/media/ff0957_c128db6b68cb4f9fb25a8b5540e2643f~mv2.jpeg' },
+      { name: '★みーや★（miiya）', link: 'https://instabio.cc/4040716Fw3PZm', avatar: 'https://static.wixstatic.com/media/3fe13f_765555b395e84bd6810b1b20703e3698~mv2.jpeg' },
+      { name: '崩壞的英文老師 Nina', link: 'https://www.instagram.com/ninaxyaa?igsh=MTFzdDIyb2wxNnFidw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/4a56c7_66ea842f9b274b0dbf7b03335c738aaf~mv2.jpeg' },
+      { name: '咖啡', link: 'https://www.facebook.com/lovecoffeecosplay', avatar: 'https://static.wixstatic.com/media/860fa7_a56431718a4043de8dbcdaa644be0ee7~mv2.jpg' },
+      { name: 'あきとん', link: 'https://twitter.com/haikarabitch', avatar: 'https://static.wixstatic.com/media/24004b_ffe8844e2241429eaa2c894fe0547464~mv2.jpeg' },
+      { name: 'AmyMiiza', link: 'https://lit.link/Amimi?fbclid=PAZXh0bgNhZW0CMTEAAadKkK9tnyEDwCxKWdN0iwsQuzdqY9RE3J0fSVl9bOqHj2G7-D5JBeYP7ErH5Q_aem_J-b-cGhE1_U3EUqc7ZhMhQ', avatar: 'https://static.wixstatic.com/media/a620eb_31a68b384b0040ad9cb80bf8bc3078a1~mv2.jpeg' },
+      { name: '墨七', link: 'https://x.com/seven_77164?s=21&t=DR4G9IyFj3pEOcZxkqhnYQ', avatar: 'https://static.wixstatic.com/media/b37682_87fdc58c16d142358ced9439fbf3d296~mv2.jpeg' },
+      { name: '章魚', link: 'https://www.instagram.com/takou._.cosplay02?igsh=MXRscDZ4a2NuZ2c1eQ%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/5ea8a1_0a532da256304e04b0ca4e2a7bd27df8~mv2.jpeg' },
+      { name: 'Lulu', link: 'https://www.instagram.com/lulu9_9978?igsh=dDh6eDV5ejl1azVh', avatar: 'https://static.wixstatic.com/media/5ea8a1_1fdc541ffc76478daab9631c38accc72~mv2.jpeg' },
+      { name: 'MOMO毛毛', link: 'https://www.instagram.com/momo180_cos/', avatar: 'https://static.wixstatic.com/media/50cd2c_5742369df5a945148f2b0ce631e97da8~mv2.jpg' },
+      { name: '周感恩', link: 'https://www.instagram.com/chi.yun__?igsh=MXNtc2s3NjBwZnd2bw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/6dd706_80adf8f76e4a4500975a90e1fa780574~mv2.jpeg' },
+      { name: '餓小璇', link: 'https://www.facebook.com/smilecutty/', avatar: 'https://static.wixstatic.com/media/a9dae4_03dcb8044434407a9c9ee5544cc6567b~mv2.jpg' },
+      { name: 'Hisui', link: 'https://www.instagram.com/hisuihisui/', avatar: 'https://static.wixstatic.com/media/0559b9_b1935827419546818ee54a836caa74ff~mv2.jpeg' },
+      { name: '柚姬', link: 'https://www.instagram.com/yuzuki_yzk030?igsh=MXdsM2VrcHg4eTN1bA==', avatar: 'https://static.wixstatic.com/media/df44cb_9e84655d762b46d58136f0463e31feca~mv2.jpg' },
+      { name: '萌雪', link: 'https://www.facebook.com/yuki.20131499?locale=zh_TW', avatar: 'https://static.wixstatic.com/media/3b57a7_c37487a073c84ccd9368b245de25435b~mv2.jpg' },
+      { name: '安希', link: 'https://www.instagram.com/anxi061/', avatar: 'https://static.wixstatic.com/media/5e2f65_92158c02fc0b424788ec5ae225441e0b~mv2.jpg' },
+      { name: '霜月', link: 'https://www.facebook.com/shimotsukiTW', avatar: 'https://static.wixstatic.com/media/91d304_20a3223e499446b9b5caae3d4e44ab60~mv2.jpg' },
+      { name: '小天TenChan', link: 'https://www.facebook.com/share/16JvqdUydq/', avatar: 'https://static.wixstatic.com/media/c3d23a_2a62fb86a2ab492d9bbb3f658abbcbbb~mv2.jpg' },
+      { name: 'E心', link: 'https://www.instagram.com/1tsuki_o?igsh=MXU4YXUwY21lYnI2cw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/099d4e_88282edc862c44bcb058389bcf4cb02e~mv2.jpeg' },
+      { name: '琪娜', link: 'https://www.instagram.com/kina72_?igsh=MXFxdHQ4MDBhOWM5cA==', avatar: 'https://static.wixstatic.com/media/099d4e_bc6ba83f4e6a45b8bfc3263f50d4f175~mv2.jpeg' },
+      { name: '理央', link: 'https://www.instagram.com/rio.ri01/', avatar: 'https://static.wixstatic.com/media/fd7fe6_b377d42df54d4f43919e67695fcf3686~mv2.jpg' },
+      { name: 'RITA', link: 'https://www.instagram.com/gal_rita_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', avatar: 'https://static.wixstatic.com/media/3bcbd7_665682390f5f4875adea683d985499a2~mv2.jpg' },
+      { name: '尼艾', link: 'https://www.facebook.com/niiecosplay', avatar: 'https://static.wixstatic.com/media/3bcbd7_ccafaaa2305d421d89a647cceebcc912~mv2.jpg' },
+      { name: '運醬', link: 'https://www.instagram.com/unjan55688/', avatar: 'https://static.wixstatic.com/media/d8f6ed_8638b6da107148fd878a91a9d3769f3f~mv2.jpg' },
+      { name: '嚕嚕夏可', link: 'https://www.instagram.com/ru.sk160/', avatar: 'https://static.wixstatic.com/media/d8f6ed_f311aca17252428f9806a3516fa539de~mv2.jpg' },
+      { name: '劉瑋晞 Tiffany', link: 'https://www.instagram.com/t.tiffany.y', avatar: 'https://static.wixstatic.com/media/3f3cc3_2ae92e15e31d436ab30683b01479b196~mv2.jpg' },
+      { name: '願願', link: 'https://www.instagram.com/yuan_yuan1126/', avatar: 'https://static.wixstatic.com/media/885b64_23e731f40edd40ff8488f8efebb316a8~mv2.jpg' },
+      { name: '亞羅', link: 'https://linktr.ee/aira.tw', avatar: 'https://static.wixstatic.com/media/b47354_fb4abfc6b39a4d58ac090c036921c0df~mv2.jpeg' },
+      { name: 'C4小炸彈-閻舒姬', link: 'https://www.instagram.com/c3_md?igsh=MWNlcGdobzl3ZGpiMw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/4855dd_c4d6bc41dbce40d9a4cc3514630212f5~mv2.jpeg' },
+      { name: '咪咪', link: 'https://www.instagram.com/mimiiii1217?igsh=MWV3YjdrbjlncHJibA==', avatar: 'https://static.wixstatic.com/media/a389cd_5c15682886c84b31969fffc0ccf9611a~mv2.jpg' },
+      { name: '阿晶', link: 'https://x.com/Akira_TWcosplay', avatar: 'https://static.wixstatic.com/media/6c38ad_e9d9a7be813245b3ae41a9f11335af9e~mv2.jpg' },
+      { name: '一元', link: 'https://www.instagram.com/_yiyuan.xayy?igsh=MXZ0ODJvYjgyemh2Zw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/a71e83_7cb1e21642c54fa99d8b30188191645d~mv2.jpeg' },
+      { name: '牛牛Niu', link: 'https://www.instagram.com/milkybird/', avatar: 'https://static.wixstatic.com/media/c3e23c_411e2db12597440ca52adf7fb84cbc59~mv2.jpeg' },
+      { name: '楊衣', link: 'https://www.facebook.com/yangyi4712', avatar: 'https://static.wixstatic.com/media/2148e3_fe94882702034186b2b4cb8ad1c9ab70~mv2.jpg' },
+      { name: 'みみ こ', link: 'https://www.facebook.com/profile.php?id=100057937727253', avatar: 'https://static.wixstatic.com/media/da2760_84ef5fb9a9814399a3af069274a4edad~mv2.jpg' },
+      { name: '名璃', link: 'https://www.facebook.com/share/1CXNoJo9fy/', avatar: 'https://static.wixstatic.com/media/95d8b3_b56a6abb50e84ef2a17e37ddf6a661fd~mv2.jpg' },
+      { name: '浵卡Tokar', link: 'https://x.com/laurus0711', avatar: 'https://static.wixstatic.com/media/2234a7_bee6b7d4953a4ba5994db149fc1f4ccc~mv2.jpg' },
+      { name: '紅葉 Momiko', link: 'https://linktr.ee/momiko_124', avatar: 'https://static.wixstatic.com/media/8a5096_b6440c3b265249f2b63fb8bc37b8bce9~mv2.jpg' },
+      { name: '睦實', link: 'https://www.instagram.com/mutsumi_63?igsh=MWx4YXRkdHpndXM4Nw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/5462ae_88c4cbde0b974818a5629e570ae40eec~mv2.jpeg' },
+      { name: 'Rana', link: 'https://www.instagram.com/ranaachaa', avatar: 'https://static.wixstatic.com/media/8a24b0_589b7b33bfff4124b625f34904fe2586~mv2.jpg' },
+      { name: 'Naki', link: 'https://www.instagram.com/naki_lam?igsh=MThrdXlzZHhmNTlzbw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/9b39a5_ea90c524a8ce41339705697989ef1da7~mv2.jpeg' },
+      { name: '米浮mifu', link: 'https://www.facebook.com/minamimifu/', avatar: 'https://static.wixstatic.com/media/f20e32_51f74558bcc54c0ba700b9ee90f39bb6~mv2.jpg' },
+      { name: '芝芝貓 ZhizhiCat', link: 'https://www.instagram.com/cosplay_zhizhi/', avatar: 'https://static.wixstatic.com/media/f20e32_20aa5688c0b74eaca30d8c3acdf8de02~mv2.jpeg' },
+      { name: '派派', link: 'https://www.facebook.com/share/18usebfvwT/?mibextid=wwXIfr', avatar: 'https://static.wixstatic.com/media/f290d1_c94748b0938f4a298b1cb305ad9d1f9e~mv2.jpeg' },
+      { name: '周感恩', link: 'https://www.instagram.com/chi.yun__?igsh=MXNtc2s3NjBwZnd2bw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/6dd706_80adf8f76e4a4500975a90e1fa780574~mv2.jpeg' },
+      { name: '夕笙', link: 'https://x.com/season_cos?s=21&t=5nRpCQOBwpR1MCArhFWzVQ', avatar: 'https://static.wixstatic.com/media/d48480_b0b055688f2f4fa7b16b1323db903fc7~mv2.jpeg' },
+      { name: '伊灰', link: 'https://x.com/ehui0403', avatar: 'https://static.wixstatic.com/media/e9a3d8_7c8f29cdc1ed41ec99409c5b0b5c9a14~mv2.jpg' },
+      { name: '喵村です★彡猫村の村長', link: 'https://www.instagram.com/nyanmura_owo?igsh=em41azF0aGV5NThz', avatar: 'https://static.wixstatic.com/media/2db40a_d802ccebf2de488f91b56d53bc970280~mv2.jpg' },
+      { name: 'Akane 茜', link: 'https://www.facebook.com/akaneee615', avatar: 'https://static.wixstatic.com/media/ce575d_0ef302387e1243808a21e35bb6a032c5~mv2.jpg' },
+      { name: '愛莉Iri', link: 'https://lit.link/irisuare', avatar: 'https://static.wixstatic.com/media/a18954_d43e37539906489d931fcb7a9cc13621~mv2.jpg' },
+      { name: '小奈Ulina', link: 'https://linktr.ee/ulinatwcosplayer?fbclid=IwY2xjawJ5onFleHRuA2FlbQIxMABicmlkETF6NlY3dnRLNHFYY09CMjVDAR4qXRKKl4P-qVc4euOhLLbksbO0MKQQ7n-HJkUfhTSb6DfogJKGOD1ErId8Kw_aem_oFCT-K_Lz50d10w14tuUTw', avatar: 'https://static.wixstatic.com/media/a18954_18a317ea9033414bb87d8ce39e417b0c~mv2.jpg' },
+      { name: '喵咪NYANKO', link: 'https://l.instagram.com/?u=https%3A%2F%2Finstabio.cc%2F30712147v5V3S%3Ffbclid%3DPAZXh0bgNhZW0CMTEAAadKcPlbxG5kHf5Yvvf_SQ-xB4Zfda6DQMJBSSsRFXw6tfFQhwN9NjBUOB5BRQ_aem_6nTvz8KVsRvXmGwv5fJjAw&e=AT2lVVZfnyPm9ot6c2YFb3IhbGtCUNMxb1QIezb2YDoiJPDwitMyPXFIt6ax_P5q8nyoupW_xae9zsnUKtuGsVyEo7tl_0Wl9cbUxw', avatar: 'https://static.wixstatic.com/media/653263_4f459578743f463eac6688fb039fc827~mv2.jpeg' },
+      { name: '黒躓カレン', link: 'https://x.com/kuroki_karen?t=9Ek84XwGARu6xZGQEvHe2A&s=09', avatar: 'https://static.wixstatic.com/media/e4cbcb_8480c4fa5d1d4fba8aac0ae93804e41c~mv2.jpg' },
+      { name: '千千', link: 'https://www.instagram.com/____qqian?igsh=MTd4cWxvcnFmcDVtMw%3D%3D&utm_source=qr', avatar: 'https://static.wixstatic.com/media/856b41_9bd6cf3c12b74fa5a257792de707f11e~mv2.jpeg' },
+      { name: '小寧', link: 'https://www.instagram.com/nixqq.425_?igsh=MTBwajc0Nm5wd3pzaQ==', avatar: 'https://static.wixstatic.com/media/856b41_ecb9d20cc6454afd83b53aea8f588a1a~mv2.jpeg' },
+    ];
+</script>
+
+    let currentPage = 0;
+    const perPage = 15;
+
+    function updateMainDisplay(index) {
+      const c = creators[index];
+      const wrapper = document.getElementById('mainWrapper');
+      const nameEl = document.getElementById('creatorName');
+      const social = document.getElementById('socialLinks');
+
+      wrapper.style.animation = 'none';
+      void wrapper.offsetWidth;
+      wrapper.style.animation = 'fadein 1s ease-in-out';
+
+      wrapper.style.backgroundImage = `url('${c.avatar}')`;
+      nameEl.textContent = c.name;
+      social.innerHTML = `<a href="${c.link}" target="_blank">Link</a>`;
+    }
+
+    function renderThumbnails() {
+      const container = document.getElementById('thumbnailGrid');
+      container.innerHTML = '';
+      const pageItems = creators.slice(currentPage * perPage, (currentPage + 1) * perPage);
+      pageItems.forEach((c, i) => {
+        const div = document.createElement('div');
+        div.className = 'thumbnail';
+        const img = document.createElement('img');
+        img.src = c.avatar;
+        img.alt = c.name;
+        img.onclick = () => updateMainDisplay(i + currentPage * perPage);
+        div.appendChild(img);
+        container.appendChild(div);
+      });
+    }
+
+    function scrollPage(direction) {
+      const maxPage = Math.ceil(creators.length / perPage) - 1;
+      currentPage = Math.max(0, Math.min(currentPage + direction, maxPage));
+      renderThumbnails();
+    }
+
+    renderThumbnails();
+    updateMainDisplay(0);
+  </script>
+</body>
+</html>
